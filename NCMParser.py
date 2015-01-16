@@ -1,43 +1,60 @@
-#class NCM:
-#    ?
-# import pdb
-# pdb.set_trace()
-class NCMParser:
-    def __init__(self, dot_bracket):
-        self.dot_bracket = dot_bracket
-
-ncm = {}
-
-dot_bracket_index = 0 # dbg
+NCM = {
+        1: {
+             3: "1_3",
+             4: "1_4",
+             5: "1_5",
+             6: "1_6"
+              },
+        2: {
+             2: {
+                   2: "2_2_2",
+                   3: "2_2_3",
+                   4: "2_2_4",
+                   5: "2_2_5"
+                    },
+             3: {
+                   2: "2_3_2",
+                   3: "2_3_3",
+                   4: "2_3_4",
+                   5: "2_3_5"
+                    },
+             4: {
+                   2: "2_4_2",
+                   3: "2_4_3",
+                   4: "2_4_4"
+                    },
+             5: {
+                   2: "2_5_2",
+                   3: "2_5_3"
+                    }
+                }
+            }
 
 def parse(dot_bracket, dangling=0):
-    global dot_bracket_index # dbg
     open_var = False
     unpaired_left = 0
     while dot_bracket:
         x = dot_bracket.pop(0)
-        dot_bracket_index += 1
         if x == "." and dangling > 0:
             unpaired_left += 1
         elif x == "(":
-            dangling += 1
-            unpaired_right, end = parse(dot_bracket, dangling)
-            dangling -= 1
             open_var = True
+            unpaired_right, end = parse(dot_bracket, dangling + 1)
             if not end:
-                print "left : " + str(unpaired_left) + ", right : " + str(unpaired_right) + ", dangling : " + str(dangling) + ", index : " + str(dot_bracket_index)
-            # get_ncm(unpaired_left, unpaired_right)
+                try:
+                    print NCM[2][unpaired_left + 2][unpaired_right + 2]
+                except:
+                    pass
         elif x == ")":
-            if unpaired_left and not open_var:
-                print "single of " + str(unpaired_left)
+            if not open_var:
+                try:
+                    print NCM[1][unpaired_left + 2]
+                except:
+                    pass
                 return 0, False
             if dangling == 1:
                 return 0, True
             return unpaired_left, False
 
 if __name__ == "__main__":
-    # p = NCMParser("..((.)).")
-
-    # parse(list("..((.))."))
     parse(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
-# ..((((...)))).....(.(.(...)).).((((......)).....))."))
