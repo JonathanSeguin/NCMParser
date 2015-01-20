@@ -30,31 +30,54 @@ NCM = {
                 }
             }
 
-def parse(dot_bracket, dangling=0):
-    open_var = False
-    unpaired_left = 0
-    while dot_bracket:
-        x = dot_bracket.pop(0)
-        if x == "." and dangling > 0:
-            unpaired_left += 1
-        elif x == "(":
-            open_var = True
-            unpaired_right, end = parse(dot_bracket, dangling + 1)
-            if not end:
-                try:
-                    print NCM[2][unpaired_left + 2][unpaired_right + 2]
-                except:
-                    pass
+def parse_helix(dot_bracket, first=True):
+    left = dot_bracket.pop(0)
+    right = dot_bracket.pop()
+    left_count = 2
+    right_count = 2
+
+    while left != "(" and left != ")":
+        left_count += 1
+        try:
+            left = dot_bracket.pop(0)
+        except:
+            try:
+                print NCM[1][left_count + 1]
+            except:
+                pass
+            return 0
+
+    while right != "(" and right != ")":
+        right_count += 1
+        right = dot_bracket.pop()
+
+    parse_helix(dot_bracket, False)
+
+    if not first:
+        try:
+            print NCM[2][left_count][right_count]
+        except:
+            pass
+
+
+def parse(dot_bracket):
+    o_stack = 0
+    c_stack = 0
+    start_index = 0
+    end_index = 0
+    for x in dot_bracket:
+        end_index += 1
+        if x == "(":
+            o_stack += 1
         elif x == ")":
-            if not open_var:
-                try:
-                    print NCM[1][unpaired_left + 2]
-                except:
-                    pass
-                return 0, False
-            if dangling == 1:
-                return 0, True
-            return unpaired_left, False
+            c_stack += 1
+            if o_stack == c_stack:
+                parse_helix(list(dot_bracket[start_index:end_index]))
+                start_index = end_index
+
 
 if __name__ == "__main__":
     parse(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
+    #parse(list("(.(...)..)"))
+    #parse(list("(((.(.(...)).)))"))
+
