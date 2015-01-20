@@ -36,7 +36,7 @@ def parse_helix(dot_bracket, first=True):
     left_count = 2
     right_count = 2
 
-    while left != "(" and left != ")":
+    while left == ".":
         left_count += 1
         try:
             left = dot_bracket.pop(0)
@@ -47,7 +47,7 @@ def parse_helix(dot_bracket, first=True):
                 pass
             return 0
 
-    while right != "(" and right != ")":
+    while right == ".":
         right_count += 1
         right = dot_bracket.pop()
 
@@ -78,6 +78,6 @@ def parse(dot_bracket):
 
 if __name__ == "__main__":
     parse(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
+    #parse(list("(((((.(((((.(((((((........)))))))..)).))).)))))"))
     #parse(list("(.(...)..)"))
     #parse(list("(((.(.(...)).)))"))
-
