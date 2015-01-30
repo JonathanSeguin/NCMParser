@@ -165,7 +165,6 @@ if __name__ == "__main__":
     # parser = NCMParser()
     # parser.ncmparser(list("(.(...)..)"))
     # print parser.ncms
-    # parser = NCMParser()
-    # parser.ncmparser(list("..((((..))))()"))
-    # print parser.ncms
-
+    parser = NCMParser()
+    parser.ncmparser(list("..((((..))))()"))
+    print parser.ncms
