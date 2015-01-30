@@ -28,6 +28,6 @@ for pdb_id in pdb_ids:
     print dot_bracket
 
     print "Parsing dot bracket for NCMs"
-    ncmparser = NCMParser().ncmparser
-    ncms = ncmparser(dot_bracket)
-    print ncms
+    ncmparser = NCMParser()
+    ncmparser.ncmparser(dot_bracket)
+    print ncmparser.ncms

@@ -94,13 +94,11 @@ class NCMParser:
             right = dot_bracket.pop()
             right_count = 1
             left_count = 1
-        else:
+        elif len(dot_bracket) == 1:
             left = dot_bracket.pop(0)
             left_count = 0
-        # left = dot_bracket.pop(0)
-        # right = dot_bracket.pop()
-        # right_count = 1
-        # left_count = 1
+        else:
+            return 0
 
         while left == ".":
             left_count += 1
@@ -132,10 +130,9 @@ class NCMParser:
         c_stack = 0
         start_index = 0
         end_index = 0
-        # print dot_bracket
+
         # Check for intersection
         dot_bracket = self._check_intersection(dot_bracket)
-        # print dot_bracket
 
         for x in dot_bracket:
             end_index += 1
@@ -150,21 +147,25 @@ class NCMParser:
 
 
 if __name__ == "__main__":
-    parser = NCMParser()
-    parser.ncmparser(list("(...).....((.))"))
-    print parser.ncms
-    parser = NCMParser()
-    parser.ncmparser(list("(.(..((...).....((.)))).)"))
-    print parser.ncms
-    parser = NCMParser()
-    parser.ncmparser(list("(((.(.(...)).)))"))
-    print parser.ncms
-    parser = NCMParser()
-    parser.ncmparser(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
-    print parser.ncms
-    parser = NCMParser()
-    parser.ncmparser(list("(((((.(((((.(((((((........)))))))..)).))).)))))"))
-    print parser.ncms
-    parser = NCMParser()
-    parser.ncmparser(list("(.(...)..)"))
-    print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("(...).....((.))"))
+    # print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("(.(..((...).....((.)))).)"))
+    # print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("(((.(.(...)).)))"))
+    # print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
+    # print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("(((((.(((((.(((((((........)))))))..)).))).)))))"))
+    # print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("(.(...)..)"))
+    # print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("..((((..))))()"))
+    # print parser.ncms
+

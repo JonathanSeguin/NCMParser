@@ -12,8 +12,11 @@ class PDB2DB:
         dot_bracket = response.text.replace("<pre>", "")
         dot_bracket = dot_bracket.replace("</pre>", "")
 
-        if first_form and dot_bracket:
-            dot_bracket = dot_bracket.splitlines()[2]
+        try:
+            if first_form and dot_bracket:
+                dot_bracket = dot_bracket.splitlines()[2]
+        except:
+            print "PDB2DB Error!"
 
         return dot_bracket
 
