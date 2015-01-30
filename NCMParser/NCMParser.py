@@ -54,7 +54,8 @@ class NCMParser:
                 if closing and stack == 1:
                     if reverse:
                         try:
-                            self.ncms.append(self.NCM[2][first_dangling + 2][left + 2])
+                            print self.NCM[2][left + 2][first_dangling + 2]
+                            self.ncms.append(self.NCM[2][left + 2][first_dangling + 2])
                         except:
                             pass
                         return dot_bracket[first_dangling + 1:][::-1]
@@ -66,12 +67,13 @@ class NCMParser:
             if x == closechar:
                 stack -= 1
                 closing = True
-            if x == "." and o_stack <= 1:
+            if x == "." and o_stack < 1:
                 first_dangling += 1
 
         if reverse:
             try:
-                self.ncms.append(self.NCM[2][first_dangling + 2][left + 2])
+                print self.NCM[2][left + 2][first_dangling + 2]
+                self.ncms.append(self.NCM[2][left + 2][first_dangling + 2])
             except:
                 pass
             return dot_bracket[first_dangling + 1:][::-1]
@@ -106,6 +108,7 @@ class NCMParser:
                 left = dot_bracket.pop(0)
             except:
                 try:
+                    print self.NCM[1][left_count + 2]
                     self.ncms.append(self.NCM[1][left_count + 2])
                 except:
                     pass
@@ -119,6 +122,7 @@ class NCMParser:
 
         if not first:
             try:
+                print self.NCM[2][left_count + 1][right_count + 1]
                 self.ncms.append(self.NCM[2][left_count + 1][right_count + 1])
             except:
                 pass
@@ -131,7 +135,7 @@ class NCMParser:
         start_index = 0
         end_index = 0
 
-        # Check for intersection
+        # Check for a first intersection
         dot_bracket = self._check_intersection(dot_bracket)
 
         for x in dot_bracket:
@@ -141,18 +145,20 @@ class NCMParser:
             elif x == ")":
                 c_stack += 1
                 if o_stack == c_stack:
+                    # print start_index
                     self._parse_helix(list(dot_bracket[start_index:end_index]))
+                    # print end_index
                     start_index = end_index
         # return self.ncms
 
 
 if __name__ == "__main__":
-    # parser = NCMParser()
-    # parser.ncmparser(list("(...).....((.))"))
-    # print parser.ncms
-    # parser = NCMParser()
-    # parser.ncmparser(list("(.(..((...).....((.)))).)"))
-    # print parser.ncms
+    parser = NCMParser()
+    parser.ncmparser(list("(.(...).....((.)))"))
+    print parser.ncms
+    parser = NCMParser()
+    parser.ncmparser(list("(.(..((...).....((.)))).)"))
+    print parser.ncms
     # parser = NCMParser()
     # parser.ncmparser(list("(((.(.(...)).)))"))
     # print parser.ncms
@@ -165,6 +171,6 @@ if __name__ == "__main__":
     # parser = NCMParser()
     # parser.ncmparser(list("(.(...)..)"))
     # print parser.ncms
-    parser = NCMParser()
-    parser.ncmparser(list("..((((..))))()"))
-    print parser.ncms
+    # parser = NCMParser()
+    # parser.ncmparser(list("..((((..))))()"))
+    # print parser.ncms
