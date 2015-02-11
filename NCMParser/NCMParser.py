@@ -35,6 +35,7 @@ class NCMParser:
                         }
                     }
         self.ncms = []
+        self.front_removed = 0
 
     def _check_intersection(self, dot_bracket, b_idx, e_idx, reverse=False, left=0, first=True):
         stack = 0
@@ -54,15 +55,16 @@ class NCMParser:
                     if reverse:
                         if not first:
                             try:
-                                # print "[ %s ] ncm_nuc_idx : %s" % (self.NCM[2][left + 2][first_dangling + 2],
-                                #         range(b_idx - 1, b_idx + first_dangling) + range(e_idx, e_idx + 1))
-                                self.ncms.append(self.NCM[2][left + 2][first_dangling + 2])
+                                print "[ %s ] ncm_nuc_idx : %s" % (self.NCM[2][left + 2][first_dangling + 2],
+                                         range(e_idx - left - 2, e_idx) + range(b_idx, b_idx + first_dangling + 2))
+                                # self.ncms.append(self.NCM[2][left + 2][first_dangling + 2])
                                 pass
                             except:
                                 pass
-                        return dot_bracket[first_dangling + 1:][::-1]
+                        return dot_bracket[first_dangling + 1:][::-1], e_idx
                     else:
-                        return self._check_intersection(dot_bracket[first_dangling + 1:][::-1], b_idx + first_dangling + 1, e_idx - 1, reverse=True, left=first_dangling, first=first)
+                        return self._check_intersection(dot_bracket[first_dangling + 1:][::-1],
+                               b_idx=(e_idx - 1),  e_idx=(b_idx + first_dangling + 1), reverse=True, left=first_dangling, first=first)
                 else:
                     stack += 1
                     closing = False
@@ -72,13 +74,14 @@ class NCMParser:
             if x == "." and o_stack < 1:
                 first_dangling += 1
 
-        return dot_bracket
+        return dot_bracket, 0
 
-    def _parse_helix(self, dot_bracket, b_idx, e_idx, first=True):
+    def _parse_helix(self, dot_bracket, b_idx, e_idx, int_b_idx, first=True):
 
-        intersection = self._check_intersection(dot_bracket, b_idx, e_idx, first=first)
+        intersection, tmp_int_b_idx = self._check_intersection(dot_bracket, b_idx, e_idx, first=first)
         if intersection != dot_bracket:
-            self.ncmparser(intersection, first=True)
+            tmp_int_b_idx = tmp_int_b_idx + int_b_idx
+            self.ncmparser(intersection, tmp_int_b_idx, first=True)
             return 0
 
         if len(dot_bracket) > 1:
@@ -99,7 +102,7 @@ class NCMParser:
                 l_cnt += 1
             except:
                 try:
-                    self.ncms.append({self.NCM[1][l_cnt + r_cnt + 2]: range(b_idx - 1, e_idx + 1)})
+                    self.ncms.append({self.NCM[1][l_cnt + r_cnt + 2]: range(b_idx + int_b_idx - 1, e_idx + int_b_idx + 1)})
                 except:
                     pass
                 return 0
@@ -108,17 +111,17 @@ class NCMParser:
             r_cnt += 1
             r = dot_bracket.pop()
 
-        self._parse_helix(dot_bracket, b_idx + l_cnt, e_idx - r_cnt, False)
+        self._parse_helix(dot_bracket, b_idx + l_cnt, e_idx - r_cnt, int_b_idx, False)
 
         if not first:
             try:
-                self.ncms.append({self.NCM[2][l_cnt + 1][r_cnt + 1]: range(b_idx - 1, b_idx + l_cnt) + range(e_idx - r_cnt, e_idx + 1)})
+                self.ncms.append({self.NCM[2][l_cnt + 1][r_cnt + 1]: range(b_idx + int_b_idx - 1, b_idx + int_b_idx + l_cnt) + range(e_idx + int_b_idx - r_cnt, e_idx + int_b_idx + 1)})
             except:
                 pass
 
         return 0
 
-    def ncmparser(self, dot_bracket, first=True):
+    def ncmparser(self, dot_bracket, int_b_idx=0, first=True):
         o_stack = 0 # open stack
         c_stack = 0 # close stack
         b_idx = 0 # helix beginning index
@@ -134,17 +137,17 @@ class NCMParser:
             elif x == ")":
                 c_stack += 1
                 if o_stack == c_stack:
-                    self._parse_helix(list(dot_bracket[b_idx:e_idx]), b_idx, e_idx, first)
+                    self._parse_helix(list(dot_bracket[b_idx:e_idx]), b_idx, e_idx, int_b_idx, first)
                     b_idx = e_idx
 
 if __name__ == "__main__":
-    pp = pprint.PrettyPrinter()
+    pp = pprint.PrettyPrinter(width=60)
     # parser = NCMParser()
     # parser.ncmparser(list("(.(...).....((.)))"))
     # pp.pprint(parser.ncms)
-    parser = NCMParser()
-    parser.ncmparser(list("(.(..((...).....((.)))).)"))
-    pp.pprint(parser.ncms)
+    # parser = NCMParser()
+    # parser.ncmparser(list("(.(..((...).....((.)))).)"))
+    # pp.pprint(parser.ncms)
     # parser = NCMParser()
     # parser.ncmparser(list("(((.(.(...)).)))"))
     # print parser.ncms
