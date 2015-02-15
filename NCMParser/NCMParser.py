@@ -34,7 +34,7 @@ class NCMParser:
                             }
                         }
                     }
-        self.ncms = {}
+        self.ncms = []
         self.front_removed = 0
         self.dot_bracket = ""
 
@@ -70,7 +70,7 @@ class NCMParser:
                             try:
                                 range1 = range(e_idx - left - 2, e_idx)
                                 range2 = range(b_idx, b_idx + first_dangling + 2)
-                                self.ncms[self.NCM[2][left + 2][first_dangling + 2]] = self._clean(range1 + range2)
+                                self.ncms.append({self.NCM[2][left + 2][first_dangling + 2]: self._clean(range1 + range2)})
                                 pass
                             except:
                                 pass
@@ -115,7 +115,7 @@ class NCMParser:
                 l_cnt += 1
             except:
                 try:
-                    self.ncms[self.NCM[1][l_cnt + r_cnt + 2]] = self._clean(range(b_idx + int_b_idx - 2, e_idx + int_b_idx + 2))
+                    self.ncms.append({self.NCM[1][l_cnt + r_cnt + 2]: self._clean(range(b_idx + int_b_idx - 2, e_idx + int_b_idx + 2))})
                 except:
                     pass
                 return 0
@@ -131,7 +131,7 @@ class NCMParser:
                 range1 = range(b_idx + int_b_idx - 2, b_idx + int_b_idx + l_cnt + 1)
                 range2 = range(e_idx + int_b_idx - r_cnt - 1, e_idx + int_b_idx + 2)
 
-                self.ncms[self.NCM[2][l_cnt + 1][r_cnt + 1]] = self._clean(range1 + range2)
+                self.ncms.append({self.NCM[2][l_cnt + 1][r_cnt + 1]: self._clean(range1 + range2)})
             except:
                 pass
 
