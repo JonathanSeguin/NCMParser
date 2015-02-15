@@ -34,8 +34,21 @@ class NCMParser:
                             }
                         }
                     }
-        self.ncms = []
+        self.ncms = {}
         self.front_removed = 0
+        self.dot_bracket = ""
+
+    def _clean(self, idx_lst):
+        try:
+            idx_lst.remove(-1)
+        except:
+            pass
+
+        try:
+            idx_lst.remove(len(self.dot_bracket) + 1)
+        except:
+            pass
+        return idx_lst
 
     def _check_intersection(self, dot_bracket, b_idx, e_idx, reverse=False, left=0, first=True):
         stack = 0
@@ -55,9 +68,9 @@ class NCMParser:
                     if reverse:
                         if not first:
                             try:
-                                print "[ %s ] ncm_nuc_idx : %s" % (self.NCM[2][left + 2][first_dangling + 2],
-                                         range(e_idx - left - 2, e_idx) + range(b_idx, b_idx + first_dangling + 2))
-                                # self.ncms.append(self.NCM[2][left + 2][first_dangling + 2])
+                                range1 = range(e_idx - left - 2, e_idx)
+                                range2 = range(b_idx, b_idx + first_dangling + 2)
+                                self.ncms[self.NCM[2][left + 2][first_dangling + 2]] = self._clean(range1 + range2)
                                 pass
                             except:
                                 pass
@@ -102,7 +115,7 @@ class NCMParser:
                 l_cnt += 1
             except:
                 try:
-                    self.ncms.append({self.NCM[1][l_cnt + r_cnt + 2]: range(b_idx + int_b_idx - 1, e_idx + int_b_idx + 1)})
+                    self.ncms[self.NCM[1][l_cnt + r_cnt + 2]] = self._clean(range(b_idx + int_b_idx - 2, e_idx + int_b_idx + 2))
                 except:
                     pass
                 return 0
@@ -115,13 +128,19 @@ class NCMParser:
 
         if not first:
             try:
-                self.ncms.append({self.NCM[2][l_cnt + 1][r_cnt + 1]: range(b_idx + int_b_idx - 1, b_idx + int_b_idx + l_cnt) + range(e_idx + int_b_idx - r_cnt, e_idx + int_b_idx + 1)})
+                range1 = range(b_idx + int_b_idx - 2, b_idx + int_b_idx + l_cnt + 1)
+                range2 = range(e_idx + int_b_idx - r_cnt - 1, e_idx + int_b_idx + 2)
+
+                self.ncms[self.NCM[2][l_cnt + 1][r_cnt + 1]] = self._clean(range1 + range2)
             except:
                 pass
 
         return 0
 
     def ncmparser(self, dot_bracket, int_b_idx=0, first=True):
+        if first:
+            self.dot_bracket = dot_bracket
+
         o_stack = 0 # open stack
         c_stack = 0 # close stack
         b_idx = 0 # helix beginning index
@@ -145,15 +164,15 @@ if __name__ == "__main__":
     # parser = NCMParser()
     # parser.ncmparser(list("(.(...).....((.)))"))
     # pp.pprint(parser.ncms)
-    # parser = NCMParser()
-    # parser.ncmparser(list("(.(..((...).....((.)))).)"))
-    # pp.pprint(parser.ncms)
+    parser = NCMParser()
+    parser.ncmparser(list("(.(..((...).....((.)))).)"))
+    pp.pprint(parser.ncms)
     # parser = NCMParser()
     # parser.ncmparser(list("(((.(.(...)).)))"))
     # print parser.ncms
-    parser = NCMParser()
-    parser.ncmparser(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
-    pp.pprint(parser.ncms)
+    # parser = NCMParser()
+    # parser.ncmparser(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
+    # pp.pprint(parser.ncms)
     # parser = NCMParser(
     # parser.ncmparser(list("(((((.(((((.(((((((........)))))))..)).))).)))))"))
     # print parser.ncms
