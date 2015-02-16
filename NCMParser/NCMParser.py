@@ -45,7 +45,7 @@ class NCMParser:
             pass
 
         try:
-            idx_lst.remove(len(self.dot_bracket) + 1)
+            idx_lst.remove(len(self.dot_bracket))
         except:
             pass
         return idx_lst
