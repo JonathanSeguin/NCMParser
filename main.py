@@ -67,5 +67,5 @@ for pdb_id in pdb_ids:
             ranges = ranges[:-1]
 
             filename = TMP_DIR + pdb_id + "." + ncm_code + "." + ranges + ".pdb"
-            print "Writing " + subset + " to : " + filename
+            print "Writing " + str(subset) + " to : " + filename
             # writePDB(filename, subset)
