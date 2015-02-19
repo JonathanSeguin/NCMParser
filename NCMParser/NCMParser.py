@@ -35,10 +35,12 @@ class NCMParser:
                         }
                     }
         self.ncms = []
-        self.front_removed = 0
         self.dot_bracket = ""
 
     def _clean(self, idx_lst):
+        # remove dupes (1_X)
+        idx_lst = list(set(idx_lst))
+
         try:
             idx_lst.remove(-1)
         except:
@@ -48,6 +50,9 @@ class NCMParser:
             idx_lst.remove(len(self.dot_bracket))
         except:
             pass
+
+        idx_lst.sort()
+
         return idx_lst
 
     def _check_intersection(self, dot_bracket, b_idx, e_idx, reverse=False, left=0, first=True):
@@ -70,6 +75,7 @@ class NCMParser:
                             try:
                                 range1 = range(e_idx - left - 2, e_idx)
                                 range2 = range(b_idx, b_idx + first_dangling + 2)
+
                                 self.ncms.append({self.NCM[2][left + 2][first_dangling + 2]: self._clean(range1 + range2)})
                                 pass
                             except:
@@ -100,8 +106,8 @@ class NCMParser:
         if len(dot_bracket) > 1:
             l = dot_bracket.pop(0) # left
             r = dot_bracket.pop() # right
-            r_cnt = 1 # left count
-            l_cnt = 1 # right count
+            r_cnt = 1 # right count
+            l_cnt = 1 # left count
         elif len(dot_bracket) == 1:
             l = dot_bracket.pop()
             l_cnt = 1
@@ -121,8 +127,8 @@ class NCMParser:
                 return 0
 
         while r == ".":
-            r_cnt += 1
             r = dot_bracket.pop()
+            r_cnt += 1
 
         self._parse_helix(dot_bracket, b_idx + l_cnt, e_idx - r_cnt, int_b_idx, False)
 
@@ -138,7 +144,7 @@ class NCMParser:
         return 0
 
     def ncmparser(self, dot_bracket, int_b_idx=0, first=True):
-        if first:
+        if not self.dot_bracket:
             self.dot_bracket = dot_bracket
 
         o_stack = 0 # open stack
@@ -164,9 +170,14 @@ if __name__ == "__main__":
     # parser = NCMParser()
     # parser.ncmparser(list("(.(...).....((.)))"))
     # pp.pprint(parser.ncms)
+
     parser = NCMParser()
-    parser.ncmparser(list("(.(..((...).....((.)))).)"))
+    parser.ncmparser(list("((.(((...)))))"))
     pp.pprint(parser.ncms)
+
+    # parser = NCMParser()
+    # parser.ncmparser(list("(.(..((...).....((.)))).)"))
+    # pp.pprint(parser.ncms)
     # parser = NCMParser()
     # parser.ncmparser(list("(((.(.(...)).)))"))
     # print parser.ncms
