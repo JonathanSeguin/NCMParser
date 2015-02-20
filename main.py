@@ -87,4 +87,5 @@ for pdb_id in pdb_ids:
             # MC-Annotate
             mca_subset_filepath = subset_filepath + ".mca"
             print "Writing MC-Annotate output to " + mca_subset_filepath
-            call([MC_ANNOTATE, subset_filepath, ">", mca_subset_filepath])
+            fout = open(mca_subset_filepath, 'w')
+            call([MC_ANNOTATE, subset_filepath], stdout=fout)
