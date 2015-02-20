@@ -1,7 +1,7 @@
 #!/usr/local/bin/python
 from PDB2DB import PDB2DB
 from NCMParser import NCMParser
-from prody import parsePDB, writePDB
+from prody import parsePDB, writePDB, parsePDBHeader
 
 from operator import itemgetter
 from itertools import groupby
@@ -10,6 +10,7 @@ import urllib
 import os
 
 TMP_DIR = "tmp/"
+SUBSET_DIR = "subsets/"
 PDB_CSV = "pdb.csv" # Comma delimited list of PDB identifiers
 MC_ANNOTATE = "MC-Annotate" # mc-annotate binary
 
@@ -50,10 +51,20 @@ for pdb_id in pdb_ids:
     ncmparser.ncmparser(dot_bracket)
     # print ncmparser.ncms
 
+    # Make tmp dir
+    if not os.path.exists(SUBSET_DIR):
+        os.makedirs(SUBSET_DIR)
+
     atoms = parsePDB(pdb_path, model=1)
+    try:
+        first_idx = parsePDBHeader(pdb_path, "polymers")[0].dbrefs[0].first[0]
+    except:
+        first_idx = 1
+
     for ncm in ncmparser.ncms:
         for ncm_code in ncm: # just one in each
             reslst = ncm[ncm_code]
+            reslst = [x + first_idx for x in reslst]
             subset = atoms.select("resnum " + ' '.join(map(str, reslst)))
 
             # convert ranges
@@ -66,6 +77,6 @@ for pdb_id in pdb_ids:
                 ranges += "_"
             ranges = ranges[:-1]
 
-            filename = TMP_DIR + pdb_id + "." + ncm_code + "." + ranges + ".pdb"
+            filename = SUBSET_DIR + pdb_id + "." + ncm_code + "." + ranges + ".pdb"
             print "Writing " + str(subset) + " to : " + filename
-            # writePDB(filename, subset)
+            writePDB(filename, subset)
