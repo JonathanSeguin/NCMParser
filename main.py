@@ -5,6 +5,7 @@ from prody import parsePDB, writePDB, parsePDBHeader
 
 from operator import itemgetter
 from itertools import groupby
+from subprocess import call
 
 import urllib
 import os
@@ -24,19 +25,21 @@ if not os.path.exists(TMP_DIR):
     os.makedirs(TMP_DIR)
 
 for pdb_id in pdb_ids:
+    print "\n=> %s" % pdb_id
     pdb_file = pdb_id + ".pdb"
     pdb_path = TMP_DIR + pdb_file
     if not os.path.isfile(pdb_path):
         print "Downloading " + pdb_file + " to " + pdb_path
         urllib.urlretrieve("http://www.rcsb.org/pdb/download/downloadFile.do?fileFormat=pdb&compression=NO&structureId=" + pdb_id, pdb_path)
     else:
-        print "Loading PDB from " + pdb_path
+        print "Found PDB file at " + pdb_path
 
     db_path = pdb_path + ".db"
     if not os.path.isfile(db_path):
         print "Converting " + pdb_path + " to dot bracket"
         pdb2db = PDB2DB().pdb2db
         dot_bracket = pdb2db(pdb_path)
+        print "Saving dot bracket to " + pdb_path
         f = open(db_path, 'w')
         f.write(dot_bracket)
         f.close()
@@ -44,12 +47,12 @@ for pdb_id in pdb_ids:
         f = open(db_path, 'r')
         dot_bracket = f.read()
         f.close()
-    print dot_bracket
+        print "Found dot bracket at " + db_path
+    print "Dot bracket : " + dot_bracket
 
-    print "Parsing dot bracket for NCMs"
+    # print "Parsing dot bracket for NCMs"
     ncmparser = NCMParser()
     ncmparser.ncmparser(dot_bracket)
-    # print ncmparser.ncms
 
     # Make tmp dir
     if not os.path.exists(SUBSET_DIR):
@@ -77,6 +80,11 @@ for pdb_id in pdb_ids:
                 ranges += "_"
             ranges = ranges[:-1]
 
-            filename = SUBSET_DIR + pdb_id + "." + ncm_code + "." + ranges + ".pdb"
-            print "Writing " + str(subset) + " to : " + filename
-            writePDB(filename, subset)
+            subset_filepath = SUBSET_DIR + pdb_id + "." + ncm_code + "." + ranges + ".pdb"
+            print "Writing " + str(subset) + " to " + subset_filepath
+            writePDB(subset_filepath, subset)
+
+            # MC-Annotate
+            mca_subset_filepath = subset_filepath + ".mca"
+            print "Writing MC-Annotate output to " + mca_subset_filepath
+            call([MC_ANNOTATE, subset_filepath, ">", mca_subset_filepath])
