@@ -75,7 +75,9 @@ for pdb_id in pdb_ids:
         ncmparser.ncmparser(dot_bracket)
 
         try:
-            first_idx = pdb_header["polymers"][0].dbrefs[0].first[0]
+            for pol in pdb_header["polymers"]:
+                if pol.chid == chain_id:
+                    first_idx = pol.dbrefs[0].first[0]
         except:
             first_idx = 1
 
