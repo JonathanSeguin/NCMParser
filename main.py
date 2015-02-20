@@ -9,6 +9,7 @@ from subprocess import call
 
 import urllib
 import os
+import glob
 
 TMP_DIR = "tmp/"
 SUBSET_DIR = "subsets/"
@@ -34,58 +35,72 @@ for pdb_id in pdb_ids:
     else:
         print "Found PDB file at " + pdb_path
 
-    db_path = pdb_path + ".db"
-    if not os.path.isfile(db_path):
+    atoms = parsePDB(pdb_path, model=1)
+    pdb_header = parsePDBHeader(pdb_path)
+
+    db_paths = glob.glob(pdb_path + ".*.db")
+    dot_brackets = {}
+    # db_path = pdb_path + ".A.db" # First polymer
+    # if not os.path.isfile(db_path):
+    if not db_paths:
         print "Converting " + pdb_path + " to dot bracket"
         pdb2db = PDB2DB().pdb2db
-        dot_bracket = pdb2db(pdb_path)
-        print "Saving dot bracket to " + pdb_path
-        f = open(db_path, 'w')
-        f.write(dot_bracket)
-        f.close()
+        dot_brackets = pdb2db(pdb_path)
+        print dot_brackets
+
+        for p_id in dot_brackets:
+            db_path = pdb_path + "." + p_id + ".db" # First polymer
+            print "Saving dot bracket to " + db_path
+            f = open(db_path, 'w')
+            f.write(dot_brackets[p_id])
+            f.close()
     else:
-        f = open(db_path, 'r')
-        dot_bracket = f.read()
-        f.close()
-        print "Found dot bracket at " + db_path
-    print "Dot bracket : " + dot_bracket
+        for db_path in db_paths:
+            chain_id = db_path[-5]
+            f = open(db_path, 'r')
+            dot_bracket = f.read()
+            dot_brackets[chain_id] = dot_bracket
+            f.close()
+            print "Found dot bracket at " + db_path
+    # print "Dot bracket : " + dot_bracket
 
     # print "Parsing dot bracket for NCMs"
-    ncmparser = NCMParser()
-    ncmparser.ncmparser(dot_bracket)
 
     # Make tmp dir
     if not os.path.exists(SUBSET_DIR):
         os.makedirs(SUBSET_DIR)
 
-    atoms = parsePDB(pdb_path, model=1)
-    try:
-        first_idx = parsePDBHeader(pdb_path, "polymers")[0].dbrefs[0].first[0]
-    except:
-        first_idx = 1
+    for chain_id, dot_bracket in dot_brackets.iteritems():
+        ncmparser = NCMParser()
+        ncmparser.ncmparser(dot_bracket)
 
-    for ncm in ncmparser.ncms:
-        for ncm_code in ncm: # just one in each
-            reslst = ncm[ncm_code]
-            reslst = [x + first_idx for x in reslst]
-            subset = atoms.select("resnum " + ' '.join(map(str, reslst)))
+        try:
+            first_idx = pdb_header["polymers"][0].dbrefs[0].first[0]
+        except:
+            first_idx = 1
 
-            # convert ranges
-            ranges = ""
-            for k, g in groupby(enumerate(reslst), lambda (i, x): i - x):
-                cur_range = map(itemgetter(1), g)
-                ranges += str(cur_range[0])
-                ranges += "-"
-                ranges += str(cur_range[len(cur_range) - 1])
-                ranges += "_"
-            ranges = ranges[:-1]
+        for ncm in ncmparser.ncms:
+            for ncm_code in ncm: # just one in each
+                reslst = ncm[ncm_code]
+                reslst = [x + first_idx for x in reslst]
+                subset = atoms.select("resnum " + ' '.join(map(str, reslst)))
 
-            subset_filepath = SUBSET_DIR + pdb_id + "." + ncm_code + "." + ranges + ".pdb"
-            print "Writing " + str(subset) + " to " + subset_filepath
-            writePDB(subset_filepath, subset)
+                # convert ranges
+                ranges = ""
+                for k, g in groupby(enumerate(reslst), lambda (i, x): i - x):
+                    cur_range = map(itemgetter(1), g)
+                    ranges += str(cur_range[0])
+                    ranges += "-"
+                    ranges += str(cur_range[len(cur_range) - 1])
+                    ranges += "_"
+                ranges = ranges[:-1]
 
-            # MC-Annotate
-            mca_subset_filepath = subset_filepath + ".mca"
-            print "Writing MC-Annotate output to " + mca_subset_filepath
-            fout = open(mca_subset_filepath, 'w')
-            call([MC_ANNOTATE, subset_filepath], stdout=fout)
+                subset_filepath = SUBSET_DIR + pdb_id + "." + chain_id + "." + ncm_code + "." + ranges + ".pdb"
+                print "Writing " + str(subset) + " to " + subset_filepath
+                writePDB(subset_filepath, subset)
+
+                # MC-Annotate
+                mca_subset_filepath = subset_filepath + ".mca"
+                print "Writing MC-Annotate output to " + mca_subset_filepath
+                fout = open(mca_subset_filepath, 'w')
+                call([MC_ANNOTATE, subset_filepath], stdout=fout)
