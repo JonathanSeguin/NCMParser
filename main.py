@@ -74,35 +74,44 @@ for pdb_id in pdb_ids:
         ncmparser = NCMParser()
         ncmparser.ncmparser(dot_bracket)
 
+        first_idx = 1
         try:
             for pol in pdb_header["polymers"]:
                 if pol.chid == chain_id:
+                    print "hi"
+                    print pol.dbrefs
                     first_idx = pol.dbrefs[0].first[0]
+                    print first_idx
         except:
-            first_idx = 1
+            pass
 
         for ncm in ncmparser.ncms:
             for ncm_code in ncm: # just one in each
                 reslst = ncm[ncm_code]
                 reslst = [x + first_idx for x in reslst]
+                reslst = filter(lambda x: x >= 0, reslst)
+
                 subset = atoms.select("resnum " + ' '.join(map(str, reslst)))
 
-                # convert ranges
-                ranges = ""
-                for k, g in groupby(enumerate(reslst), lambda (i, x): i - x):
-                    cur_range = map(itemgetter(1), g)
-                    ranges += str(cur_range[0])
-                    ranges += "-"
-                    ranges += str(cur_range[len(cur_range) - 1])
-                    ranges += "_"
-                ranges = ranges[:-1]
+                if subset:
+                    # convert ranges
+                    ranges = ""
+                    for k, g in groupby(enumerate(reslst), lambda (i, x): i - x):
+                        cur_range = map(itemgetter(1), g)
+                        ranges += str(cur_range[0])
+                        ranges += "-"
+                        ranges += str(cur_range[len(cur_range) - 1])
+                        ranges += "_"
+                    ranges = ranges[:-1]
 
-                subset_filepath = SUBSET_DIR + pdb_id + "." + chain_id + "." + ncm_code + "." + ranges + ".pdb"
-                print "Writing " + str(subset) + " to " + subset_filepath
-                writePDB(subset_filepath, subset)
+                    subset_filepath = SUBSET_DIR + pdb_id + "." + chain_id + "." + ncm_code + "." + ranges + ".pdb"
+                    print "Writing " + str(subset) + " to " + subset_filepath
+                    writePDB(subset_filepath, subset)
 
-                # MC-Annotate
-                mca_subset_filepath = subset_filepath + ".mca"
-                print "Writing MC-Annotate output to " + mca_subset_filepath
-                fout = open(mca_subset_filepath, 'w')
-                call([MC_ANNOTATE, subset_filepath], stdout=fout)
+                    # MC-Annotate
+                    mca_subset_filepath = subset_filepath + ".mca"
+                    print "Writing MC-Annotate output to " + mca_subset_filepath
+                    fout = open(mca_subset_filepath, 'w')
+                    call([MC_ANNOTATE, subset_filepath], stdout=fout)
+                else:
+                    print "ERROR: Non continuous residue numbers"
