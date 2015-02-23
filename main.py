@@ -49,7 +49,6 @@ for pdb_id in pdb_ids:
         dot_brackets = pdb2db(pdb_path)
         if not dot_brackets:
             errors['PDB2DB'].append(pdb_id)
-            break
         print dot_brackets
 
         for p_id in dot_brackets:
