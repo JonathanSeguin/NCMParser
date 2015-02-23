@@ -19,7 +19,7 @@ class PDB2DB:
             if first_form and out:
                 lines = out.splitlines()
                 if lines[0] == "There was a problem uploading your reference file.":
-                    return False
+                    return {}
                 for i in range(0, len(lines), 3):
                     line = lines[i].lstrip()
                     polymer_id = line[6] + line[7] # >1QC0:1

@@ -42,6 +42,7 @@ for pdb_id in pdb_ids:
     pdb_header = parsePDBHeader(pdb_path)
 
     db_paths = glob.glob(pdb_path + ".*.db")
+
     dot_brackets = {}
     if not db_paths:
         print "Converting " + pdb_path + " to dot bracket"
@@ -59,7 +60,7 @@ for pdb_id in pdb_ids:
             f.close()
     else:
         for db_path in db_paths:
-            chain_id = db_path[-5]
+            chain_id = db_path[-4]
             f = open(db_path, 'r')
             dot_bracket = f.read()
             dot_brackets[chain_id] = dot_bracket
@@ -114,6 +115,7 @@ for pdb_id in pdb_ids:
                     call([MC_ANNOTATE, subset_filepath], stdout=fout)
                 else:
                     print "ERROR: Non continuous residue numbers" # they exists : 1FG0
-                    errors['NCRN'].append(pdb_id)
+                    if pdb_id not in errors['NCRN']:
+                        errors['NCRN'].append(pdb_id)
 
 print errors
