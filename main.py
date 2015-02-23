@@ -16,6 +16,8 @@ SUBSET_DIR = "subsets/"
 PDB_CSV = "pdb.csv" # Comma delimited list of PDB identifiers
 MC_ANNOTATE = "MC-Annotate" # mc-annotate binary
 
+errors = {}
+
 # Read csv
 f = open(PDB_CSV, 'r')
 pdb_ids = f.read().splitlines()
@@ -40,8 +42,6 @@ for pdb_id in pdb_ids:
 
     db_paths = glob.glob(pdb_path + ".*.db")
     dot_brackets = {}
-    # db_path = pdb_path + ".A.db" # First polymer
-    # if not os.path.isfile(db_path):
     if not db_paths:
         print "Converting " + pdb_path + " to dot bracket"
         pdb2db = PDB2DB().pdb2db
@@ -62,26 +62,22 @@ for pdb_id in pdb_ids:
             dot_brackets[chain_id] = dot_bracket
             f.close()
             print "Found dot bracket at " + db_path
-    # print "Dot bracket : " + dot_bracket
-
-    # print "Parsing dot bracket for NCMs"
 
     # Make tmp dir
     if not os.path.exists(SUBSET_DIR):
         os.makedirs(SUBSET_DIR)
 
     for chain_id, dot_bracket in dot_brackets.iteritems():
+        print "Dot bracket : " + dot_bracket
         ncmparser = NCMParser()
         ncmparser.ncmparser(dot_bracket)
+        print "NCMs : " + ncmparser.ncms
 
         first_idx = 1
         try:
             for pol in pdb_header["polymers"]:
                 if pol.chid == chain_id:
-                    print "hi"
-                    print pol.dbrefs
                     first_idx = pol.dbrefs[0].first[0]
-                    print first_idx
         except:
             pass
 
@@ -91,7 +87,7 @@ for pdb_id in pdb_ids:
                 reslst = [x + first_idx for x in reslst]
                 reslst = filter(lambda x: x >= 0, reslst)
 
-                subset = atoms.select("resnum " + ' '.join(map(str, reslst)))
+                subset = atoms.select("resnum " + ' '.join(map(str, reslst))) # hack for negative starting res index (1JU7)
 
                 if subset:
                     # convert ranges
@@ -114,4 +110,7 @@ for pdb_id in pdb_ids:
                     fout = open(mca_subset_filepath, 'w')
                     call([MC_ANNOTATE, subset_filepath], stdout=fout)
                 else:
-                    print "ERROR: Non continuous residue numbers"
+                    print "ERROR: Non continuous residue numbers" # they exists : 1FG0
+                    errors['NCRN'] = ncm_code
+
+print errors

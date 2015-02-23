@@ -20,9 +20,7 @@ class PDB2DB:
                 lines = out.splitlines()
                 for i in range(0, len(lines), 3):
                     line = lines[i].lstrip()
-                    print line
                     polymer_id = line[6] + line[7] # >1QC0:1
-                    print polymer_id
                     if polymer_id != "1:":
                         break
                     else:
