@@ -71,7 +71,7 @@ for pdb_id in pdb_ids:
         print "Dot bracket : " + dot_bracket
         ncmparser = NCMParser()
         ncmparser.ncmparser(dot_bracket)
-        print "NCMs : " + ncmparser.ncms
+        print "NCMs : " + str(ncmparser.ncms)
 
         first_idx = 1
         try:
