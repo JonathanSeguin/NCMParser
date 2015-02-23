@@ -46,6 +46,9 @@ for pdb_id in pdb_ids:
         print "Converting " + pdb_path + " to dot bracket"
         pdb2db = PDB2DB().pdb2db
         dot_brackets = pdb2db(pdb_path)
+        if not dot_brackets:
+            errors['PDB2DB'] = pdb_id
+            break
         print dot_brackets
 
         for p_id in dot_brackets:
@@ -111,6 +114,6 @@ for pdb_id in pdb_ids:
                     call([MC_ANNOTATE, subset_filepath], stdout=fout)
                 else:
                     print "ERROR: Non continuous residue numbers" # they exists : 1FG0
-                    errors['NCRN'] = ncm_code
+                    errors['NCRN'] = pdb_id
 
 print errors
