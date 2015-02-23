@@ -16,7 +16,8 @@ SUBSET_DIR = "subsets/"
 PDB_CSV = "pdb.csv" # Comma delimited list of PDB identifiers
 MC_ANNOTATE = "MC-Annotate" # mc-annotate binary
 
-errors = {}
+errors = {'PDB2DB': [],
+          'NCRN': []}
 
 # Read csv
 f = open(PDB_CSV, 'r')
@@ -47,7 +48,7 @@ for pdb_id in pdb_ids:
         pdb2db = PDB2DB().pdb2db
         dot_brackets = pdb2db(pdb_path)
         if not dot_brackets:
-            errors['PDB2DB'] = pdb_id
+            errors['PDB2DB'].append(pdb_id)
             break
         print dot_brackets
 
@@ -114,6 +115,6 @@ for pdb_id in pdb_ids:
                     call([MC_ANNOTATE, subset_filepath], stdout=fout)
                 else:
                     print "ERROR: Non continuous residue numbers" # they exists : 1FG0
-                    errors['NCRN'] = pdb_id
+                    errors['NCRN'].append(pdb_id)
 
 print errors
