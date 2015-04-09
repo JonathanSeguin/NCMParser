@@ -38,4 +38,4 @@ if __name__ == "__main__":
     try:
         print pdb.pdb2db(sys.argv[1])
     except:
-        print "Usage : pdb2db.py filename.pdb"
+        print "Usage : PDB2DB.py filename.pdb"

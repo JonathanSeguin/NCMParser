@@ -118,4 +118,4 @@ for pdb_id in pdb_ids:
                     if pdb_id not in errors['NCRN']:
                         errors['NCRN'].append(pdb_id)
 
-print errors
+print "All done.\nErrors : " + str(errors)

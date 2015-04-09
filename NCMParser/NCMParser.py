@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import pprint
+import sys
 class NCMParser:
 
     def __init__(self):
@@ -152,9 +152,6 @@ class NCMParser:
         b_idx = 0 # helix beginning index
         e_idx = 0 # helix end index
 
-        # Check for a first intersection
-        # dot_bracket = self._check_intersection(dot_bracket, b_idx, len(dot_bracket) - 1)
-
         for x in dot_bracket:
             e_idx += 1
             if x == "(":
@@ -166,30 +163,11 @@ class NCMParser:
                     b_idx = e_idx
 
 if __name__ == "__main__":
-    pp = pprint.PrettyPrinter(width=60)
-    # parser = NCMParser()
-    # parser.ncmparser(list("(.(...).....((.)))"))
-    # pp.pprint(parser.ncms)
-
     parser = NCMParser()
-    parser.ncmparser(list("((.(((...)))))"))
-    pp.pprint(parser.ncms)
 
-    # parser = NCMParser()
-    # parser.ncmparser(list("(.(..((...).....((.)))).)"))
-    # pp.pprint(parser.ncms)
-    # parser = NCMParser()
-    # parser.ncmparser(list("(((.(.(...)).)))"))
-    # print parser.ncms
-    # parser = NCMParser()
-    # parser.ncmparser(list("..((((...)))).....(.(.(...)).).((((......)).....))."))
-    # pp.pprint(parser.ncms)
-    # parser = NCMParser(
-    # parser.ncmparser(list("(((((.(((((.(((((((........)))))))..)).))).)))))"))
-    # print parser.ncms
-    # parser = NCMParser()
-    # parser.ncmparser(list("(.(...)..)"))
-    # print parser.ncms
-    # parser = NCMParser()
-    # parser.ncmparser(list("..((((..))))()"))
-    # print parser.ncms
+    try:
+        db = open(sys.argv[1], 'r')
+        parser.ncmparser(str(db.readlines()[0]))
+        print parser.ncms
+    except:
+        print "Usage : NCMParser.py dotbracket_file.db"
