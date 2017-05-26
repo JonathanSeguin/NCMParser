@@ -5,11 +5,11 @@ This project aims to provide an automated pipeline for the statistical analysis 
 #### **PDB2DB**
 Wrapper for the PDB2DB script running at http://major.iric.ca/~blanchmf/pdb2db_v2/.
 
-#####Usage (standalone)
+##### Usage (standalone)
 
     $PDB2DB.py 2KUU.pdb
 
-#####Usage (class)
+##### Usage (class)
 
     pdb = PDB2DB()
     out = pdb.pdb2db("2KUU.pdb")
@@ -17,23 +17,23 @@ Wrapper for the PDB2DB script running at http://major.iric.ca/~blanchmf/pdb2db_v
 
 #### **NCMParser**
 
-#####Usage (standalone)
+##### Usage (standalone)
 
     $NCMParser.py dotbracket_file.db
 
-#####Usage (class)
+##### Usage (class)
 
     parser = NCMParser()
     parser.ncmparser(".(.(...)))")
     out = parser.ncms
 
-####**main.py**
+#### **main.py**
 Pipeline script wrapping PDB2DB, NCMParser, ProDy PDB parsing and MC-Annotate.
 
-#####Usage
+##### Usage
 Simply set the various variables in the script header (location of the MC-Annotate executable, list of PDB IDs etc...) and run.
 
-####**pdb.csv**
+#### **pdb.csv**
 List of 531 "non redundant" PDB IDs as found in the Supplementary Methods of the 2008 Nature paper by Marc Parisien and Francois Major (*Parisien, Marc, and Francois Major. "The MC-Fold and MC-Sym pipeline infers RNA structure from sequence data." Nature 452.7183 (2008): 51-55*)
 
 ----------
